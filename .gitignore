@@ -1,0 +1,29 @@
+# macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.com.apple.timemachine.*
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go dependency directories
+vendor/
+Godeps/
+
+# Go workspace file
+go.work
+go.work.sum
+
+#executable
+pokedexcli
