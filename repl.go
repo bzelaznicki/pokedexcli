@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-var commands map[string]cliCommand
-
 func cleanInput(text string) []string {
 
 	lowerCase := strings.ToLower(text)
@@ -18,18 +16,7 @@ func cleanInput(text string) []string {
 }
 
 func startRepl() {
-	commands = map[string]cliCommand{
-		"help": {
-			name:        "help",
-			description: "Displays a help message",
-			callback:    commandHelp,
-		},
-		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
-		},
-	}
+
 	fmt.Println("Welcome to the Pokedex!")
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -41,7 +28,8 @@ func startRepl() {
 			if len(cleaned) == 0 {
 				continue
 			}
-			if value, exists := commands[cleaned[0]]; exists {
+			command := cleaned[0]
+			if value, exists := getCommands()[command]; exists {
 				err := value.callback()
 				if err != nil {
 					fmt.Printf("Error: %v\n", err)
@@ -52,20 +40,4 @@ func startRepl() {
 		}
 
 	}
-}
-
-func commandHelp() error {
-	fmt.Println("Usage:")
-
-	for commandName, command := range commands {
-		fmt.Printf("%s: %s\n", commandName, command.description)
-	}
-	return nil
-
-}
-
-func commandExit() error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
 }
