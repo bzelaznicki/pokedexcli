@@ -16,6 +16,7 @@ Icon
 *.dylib
 *.test
 *.out
+*.log
 
 # Go dependency directories
 vendor/
