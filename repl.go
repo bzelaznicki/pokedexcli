@@ -15,7 +15,7 @@ func cleanInput(text string) []string {
 	return cleanedInput
 }
 
-func startRepl() {
+func startRepl(cfg *config) {
 
 	fmt.Println("Welcome to the Pokedex!")
 
@@ -30,7 +30,7 @@ func startRepl() {
 			}
 			command := cleaned[0]
 			if value, exists := getCommands()[command]; exists {
-				err := value.callback()
+				err := value.callback(cfg)
 				if err != nil {
 					fmt.Printf("Error: %v\n", err)
 				}
