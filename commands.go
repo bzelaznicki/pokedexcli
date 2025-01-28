@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/bzelaznicki/pokedexcli/internal/pokeapi"
 )
@@ -40,7 +42,19 @@ func getCommands() map[string]cliCommand {
 			description: "Shows you more details about a specific location. Usage: explore location_name",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "attempts to catch a Pokemon. Usage: catch pokemon_name",
+			callback:    commandCatch,
+		},
 	}
+}
+
+func getSingleParam(params []string) (string, error) {
+	if len(params) != 1 {
+		return "", fmt.Errorf("you must provide a single argument")
+	}
+	return params[0], nil
 }
 func commandHelp(cfg *config, params []string) error {
 	fmt.Println("Usage:")
@@ -99,11 +113,10 @@ func commandMapb(cfg *config, params []string) error {
 }
 
 func commandExplore(cfg *config, params []string) error {
-	if len(params) != 1 {
-		return fmt.Errorf("you must provide a location name")
+	locationName, err := getSingleParam(params)
+	if err != nil {
+		return err
 	}
-
-	locationName := params[0]
 	fmt.Printf("Exploring %s...\n", locationName)
 
 	locData, err := cfg.pokeapiClient.GetLocationArea(locationName)
@@ -114,6 +127,47 @@ func commandExplore(cfg *config, params []string) error {
 	fmt.Println("Found Pokemon:")
 	for _, encounter := range locData.PokemonEncounters {
 		fmt.Printf(" - %s\n", encounter.Pokemon.Name)
+	}
+
+	return nil
+}
+
+func commandCatch(cfg *config, params []string) error {
+	pokemonName, err := getSingleParam(params)
+	if err != nil {
+		return err
+	}
+	if _, exists := cfg.pokedex[pokemonName]; exists {
+		fmt.Printf("You already caught %s!\n", pokemonName)
+		return nil
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
+
+	pokemonInfo, err := cfg.pokeapiClient.GetPokemonInfo(pokemonName)
+	if err != nil {
+		return err
+	}
+
+	rand.Seed(time.Now().UnixNano())
+
+	// Calculate the chance and cap it between 10% and 90%
+	chance := 100 - pokemonInfo.BaseExp/10
+
+	// Clamp chance within the min/max range
+	if chance < minCatchChance {
+		chance = minCatchChance
+	} else if chance > maxCatchChance {
+		chance = maxCatchChance
+	}
+
+	// Generate a random number and determine the result
+	r := rand.Intn(100)
+	if r < chance {
+		fmt.Printf("Caught %s!\n", pokemonName)
+		// Add the caught Pokemon to the Pokedex here
+		cfg.pokedex[pokemonName] = pokemonInfo
+	} else {
+		fmt.Printf("%s escaped!\n", pokemonName)
 	}
 
 	return nil
