@@ -29,8 +29,9 @@ func startRepl(cfg *config) {
 				continue
 			}
 			command := cleaned[0]
+
 			if value, exists := getCommands()[command]; exists {
-				err := value.callback(cfg)
+				err := value.callback(cfg, cleaned[1:])
 				if err != nil {
 					fmt.Printf("Error: %v\n", err)
 				}
