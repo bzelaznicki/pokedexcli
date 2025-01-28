@@ -35,7 +35,7 @@ func startRepl(cfg *config) {
 				err := value.callback(cfg, cleaned[1:])
 				if err != nil {
 					fmt.Printf("Error: %v\n", err)
-					logToFile("errors.log", err) // A helper function to append errors to a file
+					logToFile("errors.log", err)
 				}
 			} else {
 				fmt.Println("Unknown command")
