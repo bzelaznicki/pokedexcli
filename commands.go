@@ -52,6 +52,11 @@ func getCommands() map[string]cliCommand {
 			description: "inspects a pokemon in your Pokedex. Usage inspect pokemon_name",
 			callback:    commandInspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "displays the pokemon in your Pokedex",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -204,6 +209,21 @@ func commandInspect(cfg *config, params []string) error {
 	for _, pkType := range poke.Types {
 		fmt.Printf("  - %s\n", pkType.Type.Name)
 	}
+
+	return nil
+}
+
+func commandPokedex(cfg *config, params []string) error {
+	if len(cfg.pokedex) == 0 {
+		fmt.Printf("your pokedex is empty!\n")
+		return nil
+	}
+	fmt.Printf("Your Pokedex:\n")
+	for pkmn := range cfg.pokedex {
+		fmt.Printf("- %s\n", pkmn)
+	}
+
+	fmt.Printf("You have a total of %d Pokemon in your Pokedex\n", len(cfg.pokedex))
 
 	return nil
 }
